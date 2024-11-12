@@ -4,20 +4,23 @@ import math
 
 
 pg.init()
-time = 1
+time_t = 0.25
 
 #constants
 infoObject = pg.display.Info()
 width, height = infoObject.current_w, infoObject.current_h
+width = 1920
+height = 1080
 FPS = 60
-RADIUS = 5
+RADIUS = 10
 PLAYER_COLOR = "white"
 #video
-screen = pg.display.set_mode((width, height), display=0)
+screen = pg.display.set_mode((width, height), pygame.FULLSCREEN, display=0)
 scale_x = width // 1920
 scale_y = height // 1080
 name = "Game"
 clock = pg.time.Clock()
+TIME_1 = None
 #game consts
 enemies = pg.sprite.Group()
 all_sprites = pg.sprite.Group()
