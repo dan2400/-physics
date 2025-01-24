@@ -1,3 +1,11 @@
-pygame
-python-dotenv
-numba
+pygame~=2.6.1
+python-dotenv~=1.0.1
+numba~=0.60.0
+pip~=24.3.1
+pillow~=11.1.0
+packaging~=24.2
+pymunk~=6.11.0
+opencv-python~=4.10.0.84
+langid~=1.1.6
+pytesseract~=0.3.13
+autocorrect~=2.6.1

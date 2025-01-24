@@ -27,6 +27,9 @@ class InputBox:
             else:
                 self.text += event.unicode
 
+    def clear(self):
+        self.text = ''
+
     def out(self):
         print(self.text)
         return self.text
