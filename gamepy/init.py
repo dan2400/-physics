@@ -25,7 +25,7 @@ RADIUS = 10
 PLAYER_COLOR = "white"
 print(width, height)
 #video
-screen = pg.display.set_mode((width_x, height_y), pygame.FULLSCREEN, display=1)
+screen = pg.display.set_mode((width_x, height_y), pygame.FULLSCREEN, display=0)
 scale_x = width_x // 640
 scale_y = height_y // 360
 name = "Game"

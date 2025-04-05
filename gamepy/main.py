@@ -10,8 +10,20 @@ import texts
 import time
 import pymunk.pygame_util
 from random import randrange
+import asyncio
 
 dotenv.load_dotenv()
+
+import sys
+
+def resource_path(relative_path):
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 class Game(pg.sprite.Sprite):
@@ -81,7 +93,7 @@ class Settings(pg.sprite.Sprite):
     def __init__(self, where='choice'):
         self.name = "settings"
         self.game = None
-        self.contin = Button("Продолжить", 0.3, "black", self.name)
+        self.contin = Button("Вернуться", 0.3, "black", self.name)
         self.menu = Button("Меню", 0.6, "black", self.name)
         self.qute = Button("Выйти", 0.9, "black", self.name)
         self.where = where
@@ -99,13 +111,13 @@ class Settings(pg.sprite.Sprite):
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.contin.push():
                 self.contin.prepare(screen)
+
             elif self.menu.push():
                 self.menu.prepare(screen)
             elif self.qute.push():
                 self.qute.prepare(screen)
 
     def mouse_button_up(self, event):
-        global run
         if event.type == pg.MOUSEBUTTONUP:
             if self.contin.push():
                 # self.new_game()
@@ -115,13 +127,13 @@ class Settings(pg.sprite.Sprite):
                 os.environ["FROM"] = self.name
                 os.environ["STATUS"] = "menu"
             elif self.qute.push():
-                run = False
+                return True
+
 
     def key_down(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                global run
-                run = False
+                return True
 
 
 class Lever(pg.sprite.Sprite):
@@ -460,7 +472,6 @@ class Choice(pg.sprite.Sprite):
                 os.environ["FROM"] = self.name
                 os.environ["STATUS"] = "menu"
 
-
 if __name__ == '__main__':
     themes = [
         'lever',
@@ -474,63 +485,87 @@ if __name__ == '__main__':
         "lever_text": Lever_text(),
         "lever_question": Lever_question(),
     }
-    run = True
 
-    while run:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                run = False
+async def main():
+    if __name__ == '__main__':
+        run = True
+
+        while run:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    run = False
+
+                if os.environ.get("STATUS", default="main") == "game":
+                    all_scenes["game"].draw()
+                    all_scenes["game"].key_down(event)
+
+                if os.environ.get("STATUS", default="main") == "settings":
+                    all_scenes["settings"].draw()
+                    all_scenes["settings"].mouse_button_down(event)
+                    if all_scenes["settings"].mouse_button_up(event):
+                        run = False
+                    if all_scenes["settings"].key_down(event):
+                        run = False
+
+                if os.environ.get("STATUS", default="main") == "choice":
+                    all_scenes["choice"].draw()
+                    all_scenes["choice"].mouse_button_down(event)
+                    all_scenes["choice"].mouse_button_up(event)
+                    all_scenes["choice"].key_down(event)
+
+                if os.environ.get("STATUS", default="main") == "lever":
+                    all_scenes["lever"].key_down(event)
+                    all_scenes["lever"].mouse_button_up(event)
+                    all_scenes["lever"].mouse_button_down(event)
+
+                if os.environ.get("STATUS", default="main") == "menu":
+                    all_scenes["menu"].draw()
+                    all_scenes["menu"].mouse_button_down(event)
+                    all_scenes["menu"].mouse_button_up(event)
+                    all_scenes["menu"].key_down(event)
+
+                if os.environ.get("STATUS", default="main") == "lever_text":
+                    all_scenes["lever_text"].mouse_button_up(event)
+                    all_scenes["lever_text"].mouse_button_down(event)
+                    all_scenes["lever_text"].mouse_wheel(event)
+                    all_scenes["lever_text"].draw()
+
+                if os.environ.get("STATUS", default="main") == "lever_question":
+                    all_scenes["lever_question"].draw()
+                    all_scenes["lever_question"].key_down(event)
+                    all_scenes["lever_question"].mouse_button_up(event)
+                    all_scenes["lever_question"].mouse_button_down(event)
+
+            if os.environ.get("STATUS", default="main") == "lever":
+                all_scenes["lever"].draw()
 
             if os.environ.get("STATUS", default="main") == "game":
                 all_scenes["game"].draw()
-                all_scenes["game"].key_down(event)
 
             if os.environ.get("STATUS", default="main") == "settings":
                 all_scenes["settings"].draw()
-                all_scenes["settings"].mouse_button_down(event)
-                all_scenes["settings"].mouse_button_up(event)
-                all_scenes["settings"].key_down(event)
 
             if os.environ.get("STATUS", default="main") == "choice":
                 all_scenes["choice"].draw()
-                all_scenes["choice"].mouse_button_down(event)
-                all_scenes["choice"].mouse_button_up(event)
-                all_scenes["choice"].key_down(event)
-
-            if os.environ.get("STATUS", default="main") == "lever":
-                all_scenes["lever"].key_down(event)
-                all_scenes["lever"].mouse_button_up(event)
-                all_scenes["lever"].mouse_button_down(event)
 
             if os.environ.get("STATUS", default="main") == "menu":
                 all_scenes["menu"].draw()
-                all_scenes["menu"].mouse_button_down(event)
-                all_scenes["menu"].mouse_button_up(event)
-                all_scenes["menu"].key_down(event)
 
             if os.environ.get("STATUS", default="main") == "lever_text":
-                all_scenes["lever_text"].mouse_button_up(event)
-                all_scenes["lever_text"].mouse_button_down(event)
-                all_scenes["lever_text"].mouse_wheel(event)
                 all_scenes["lever_text"].draw()
 
             if os.environ.get("STATUS", default="main") == "lever_question":
                 all_scenes["lever_question"].draw()
-                all_scenes["lever_question"].key_down(event)
-                all_scenes["lever_question"].mouse_button_up(event)
-                all_scenes["lever_question"].mouse_button_down(event)
-
-        if os.environ.get("STATUS", default="main") == "lever":
-            all_scenes["lever"].draw()
 
 
-        if show_fps:
-            fps = str(int(clock.get_fps()))
-            font = pg.font.Font(None, 20)
-            screen.blit(font.render(fps, 1, (255, 255, 255)), (10, 10))
+            if show_fps:
+                fps = str(int(clock.get_fps()))
+                font = pg.font.Font(None, 20)
+                screen.blit(font.render(fps, 1, (255, 255, 255)), (10, 10))
 
-        pg.display.flip()
-        clock.tick(FPS)
-pg.quit()
-
+            pg.display.flip()
+            clock.tick(FPS)
+            await asyncio.sleep(0)
+    pg.quit()
+asyncio.run(main())
 # 5 true
